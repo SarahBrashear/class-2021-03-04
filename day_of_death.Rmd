@@ -19,3 +19,38 @@ x <- data.table::fread("~/bunmd_v2.csv") %>%
   select(ssn, lname, dyear, dmonth, dday, byear, bmonth, bday)
 ```
 
+
+```{r}
+small <- x %>%
+  slice_sample(prop = 0.01)
+
+```
+
+
+```{r}
+small %>%
+  drop_na(dday) %>%
+  ggplot(mapping = aes(x = dday)) +
+  geom_bar() +
+  labs(title = "Deaths by Day of the Month",
+       subtitle = "Suspicious Number of Deaths on the 15th"
+        )
+```
+
+```{r death_ratios}
+
+small %>%
+  filter(dday %in% c(1, 2)) %>%
+  group_by(dyear, dday) %>%
+  summarize(deaths = n(),
+            .groups = "drop") %>%
+  pivot_wider(names_from = dday,
+              values_from = deaths) %>%
+  mutate(ratio = `1` / `2`) %>%
+  ggplot(aes(x = dyear,
+             y = ratio)) +
+  geom_point()
+
+```
+
+
